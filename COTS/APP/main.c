@@ -2,33 +2,25 @@
  * main.c
  *  Created on: July 26, 2022
  *  Author: Khaled_El-Sayed
- */
-
-#define blue	Pin_2
-#define F_CPU 16000000L
+*/
 #include "COTS/Library/Standard_Types.h"
 #include "COTS/Library/Macros.h"
 #include "COTS/MCAL/DIO/DIO_Interface.h"
 #include "COTS/HAL/LCD/LCD_Interface.h"
-#include "COTS/HAL/Keypad/Keypad_Interface.h"
+#include "COTS/MCAL/UART/UART_Interface.h"
 
-void temp (void);
 int main(void)
 {
-	LCD_VidInitialization();
-	Keypad_VidInitialization();
-	u8 i='0';
+	u8 num=0;
+	DIO_VidSet_Whole_Port_Direction(Port_C, OUTPUT);
+	UART_VidInitialization(Transmit_Recive,Rx_Disable,Tx_Disable);
 	while(TRUE)
 	{
-		while(1)
-		{
-			LCD_VidSend_Data(i);
-			i=Keypad_u8Get_Pressed_Key_Wait();
-		}
+		num=0;
+		UART_VidRead_Data(&num);
+		UART_VidSend_Data(num);
+		if (num=='1')DIO_VidSet_Port_Value(Port_C, 0xff);
+		else if (num=='0')DIO_VidSet_Port_Value(Port_C, 0);
+		else if (num)DIO_VidToggle_Port_Value(Port_C);
 	}
-}
-
-void temp (void)
-{
-	DIO_VidToggle_Pin_Value(Port_C, blue);
 }
