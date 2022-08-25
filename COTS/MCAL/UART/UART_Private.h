@@ -46,7 +46,7 @@
 /******** Macros for Configure ********/
 typedef enum {Transmit_Recive,Transmit,Recive,Stop,Tx_Enable,Tx_Disable,Rx_Enable,Rx_Disable}UART_Mode;
 typedef enum {S_9600}UART_BaudRate;
-typedef enum {Normal_Speed,Double_Speed}UART_Configure;
+typedef enum {Normal_Speed,Double_Speed,Send,Receive}UART_Configure;
 
 /******** Macro ********/
 #define		S_9600UBRR			0x33

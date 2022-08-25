@@ -72,18 +72,21 @@ void UART_VidInitialization (u8 Copy_u8Mode,u8 Copy_u8Rx_Interrupt,u8 Copy_u8Tx_
 #endif
 }
 /*------------------------- UART Send -------------------------*/
-void UART_VidRead_Data (u8 *Copy_u8Data)
+void UART_VidSend_Receive (u8 Copy_u8Mode,u8 *Copy_u8Data)
 {
-	/* Wait for empty transmit buffer */
-	while(!Get_Bit(UCSRA,UCSRA_RXC));
-	/*Write Data Into Data Register*/
-	*Copy_u8Data=UDR;
+	if(Copy_u8Mode==Receive)
+	{
+		/* Wait for empty transmit buffer */
+		while(!Get_Bit(UCSRA,UCSRA_RXC));
+		/*Write Data Into Data Register*/
+		*Copy_u8Data=UDR;
+	}
+	else if(Copy_u8Mode==Send)
+	{
+		/* Wait for empty transmit buffer */
+		while(!Get_Bit(UCSRA,UCSRA_UDRE));
+		/*Write Data Into Data Register*/
+		UDR=*Copy_u8Data;
+	}
 }
-/*------------------------- UART Receive -------------------------*/
-void UART_VidSend_Data (u8 Copy_u8Data)
-{
-	/* Wait for empty transmit buffer */
-	while(!Get_Bit(UCSRA,UCSRA_UDRE));
-	/*Write Data Into Data Register*/
-	UDR=Copy_u8Data;
-}
+

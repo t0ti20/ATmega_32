@@ -8,7 +8,6 @@
 #include "UART_Private.h"
 /*---------------------------- UART Functions ----------------------------*/
 void UART_VidInitialization (u8 Copy_u8Mode,u8 Copy_u8Rx_Interrupt,u8 Copy_u8Tx_Interrupt);
-void UART_VidSend_Data (u8 Copy_u8Data);
-void UART_VidRead_Data (u8 *Copy_u8Data);
+void UART_VidSend_Receive (u8 Copy_u8Mode,u8 *Copy_u8Data);
 #endif
 /* UART_INTERFACE_H_ */

@@ -1,83 +1,97 @@
 /*------------------------------- INCLUDE -------------------------------*/
-#include "../../Library/Macros.h"
-#include "../../Library/Standard_Types.h"
-#include "../../MCAL/SPI/SPI_Config.h"
-#include "../../MCAL/SPI/SPI_Interface.h"
-#include "../../MCAL/SPI/SPI_Private.h"
+#include "SPI_Interface.h"
 /*------------------------- OPTIONS FOR SPI -------------------------*/
-void SPI_VidInitialization (u8 Copy_u8Master_Slave)
+void SPI_VidInitialization (u8 Copy_u8Master_Slave,u8 Copy_u8Interrupt)
 {
-	switch(Copy_u8Master_Slave)	/* Master/Slave Select (0-Slave)(1-Master) */
+	/* Master Slave Select*/
+	switch(Copy_u8Master_Slave)
 	{
-		case(Master):Set_Bit(SPCR,SPCR_MSTR);break;
-		case(Slave):Clear_Bit(SPCR,SPCR_MSTR);break;
+		case(Master):DIO_VidSet_Pin_Direction(Data_Port, MOSI_Pin, OUTPUT);DIO_VidSet_Pin_Direction(Data_Port, MISO_Pin,INPUT);DIO_VidSet_Pin_Direction(Data_Port,SPI_SCK,OUTPUT);Set_Bit(SPCR,SPCR_MSTR);break;
+		case(Slave):DIO_VidSet_Pin_Direction(Data_Port, MOSI_Pin, INPUT);DIO_VidSet_Pin_Direction(Data_Port, MISO_Pin,OUTPUT);Clear_Bit(SPCR,SPCR_MSTR);break;
 		default:Clear_Bit(SPCR,SPCR_MSTR);break;
 	}
-
-	#if SPI_Interrupt == Disable		/* SPI Interrupt Enable */
-		Clear_Bit(SPCR,SPCR_SPIE);
-	#elif SPI_Interrupt == Enable
-		Set_Bit(SPCR,SPCR_SPIE);
-	#else
-				#warning (" Wrong Configuration !!")
-	#endif
-
-	#if Data_Order == Left		/* Data Order (0-Lift)(1-Right) */
+	/* Interrupt Setup */
+	if(Copy_u8Interrupt==SPI_Interrupt_Enable)Set_Bit(SPCR,SPCR_SPIE);
+	else Clear_Bit(SPCR,SPCR_SPIE);
+	/* Data Order */
+	#if Data_Order == Left
 		Clear_Bit(SPCR,SPCR_DORD);
 	#elif Data_Order == Right
 		Set_Bit(SPCR,SPCR_DORD);
 	#else
 				#warning (" Wrong Configuration !!")
 	#endif
-
-	#if Clock_Polarity == Rising		/* Clock Polarity (0-Rising)(1-Falling) */
+	/* Clock Polarity*/
+	#if Clock_Polarity == Leading_Rising
 		Clear_Bit(SPCR,SPCR_CPOL);
-	#elif Clock_Polarity == Falling
+	#elif Clock_Polarity == Leading_Falling
 		Set_Bit(SPCR,SPCR_CPOL);
 	#else
 				#warning (" Wrong Configuration !!")
 	#endif
-
-	#if Clock_Phase == Setup		/* Clock Polarity (0-Rising)(1-Falling) */
+		/* Clock Phase*/
+	#if Clock_Phase == Leading_Sample
 		Clear_Bit(SPCR,SPCR_CPOL);
-	#elif Clock_Phase == Sample
+	#elif Clock_Phase == Leading_Setup
 		Set_Bit(SPCR,SPCR_CPOL);
 	#else
 				#warning (" Wrong Configuration !!")
 	#endif
-
-	Set_Bit(SPSR,SPSR_SPI2X); /* Double SPI Speed Bit */
-
-
-	#if Clock_Rate == by_2	/* Clock Rate Select */
-		Set_Bit(SPCR,SPCR_SPR0);
-		Clear_Bit(SPCR,SPCR_SPR1);
-	#elif	Clock_Rate == by_8
-		Clear_Bit(SPCR,SPCR_SPR0);
-		Clear_Bit(SPCR,SPCR_SPR1);
-	#elif Clock_Rate == by_32
-		Clear_Bit(SPCR,SPCR_SPR0);
-		Set_Bit(SPCR,SPCR_SPR1);
-	#elif Clock_Rate == by_64
-		Set_Bit(SPCR,SPCR_SPR0);
-		Set_Bit(SPCR,SPCR_SPR1);
-	#else
+	/* Double SPI Speed Bit & Clock Rate Select*/
+#if (SPI_Speed == Normal) && (Clock_Rate == Pre_Scalar_4)
+	Clear_Bit(SPSR,SPSR_SPI2X);
+	Clear_Bit(SPCR,SPCR_SPR0);
+	Clear_Bit(SPCR,SPCR_SPR1);
+#elif (SPI_Speed == Normal) && (Clock_Rate == Pre_Scalar_16)
+	Clear_Bit(SPSR,SPSR_SPI2X);
+	Clear_Bit(SPCR,SPCR_SPR1);
+	Set_Bit(SPCR,SPCR_SPR0);
+#elif (SPI_Speed == Normal) && (Clock_Rate == Pre_Scalar_64)
+	Clear_Bit(SPSR,SPSR_SPI2X);
+	Set_Bit(SPCR,SPCR_SPR1);
+	Clear_Bit(SPCR,SPCR_SPR0);
+#elif (SPI_Speed == Normal) && (Clock_Rate == Pre_Scalar_128)
+	Clear_Bit(SPSR,SPSR_SPI2X);
+	Set_Bit(SPCR,SPCR_SPR1);
+	Set_Bit(SPCR,SPCR_SPR0);
+#elif (SPI_Speed == Double) && (Clock_Rate == Pre_Scalar_2)
+	Set_Bit(SPSR,SPSR_SPI2X);
+	Set_Bit(SPCR,SPCR_SPR0);
+	Clear_Bit(SPCR,SPCR_SPR1);
+#elif (SPI_Speed == Double) && (Clock_Rate == Pre_Scalar_8)
+	Set_Bit(SPSR,SPSR_SPI2X);
+	Clear_Bit(SPCR,SPCR_SPR0);
+	Clear_Bit(SPCR,SPCR_SPR1);
+#elif (SPI_Speed == Double) && (Clock_Rate == Pre_Scalar_32)
+	Set_Bit(SPSR,SPSR_SPI2X);
+	Clear_Bit(SPCR,SPCR_SPR0);
+	Set_Bit(SPCR,SPCR_SPR1);
+#elif (SPI_Speed == Double) && (Clock_Rate == Pre_Scalar_64)
+	Set_Bit(SPSR,SPSR_SPI2X);
+	Set_Bit(SPCR,SPCR_SPR0);
+	Set_Bit(SPCR,SPCR_SPR1);
+#else
 			#warning (" Wrong Configuration !!")
-	#endif
-
-	Set_Bit(SPCR,SPCR_SPE);	   /* SPI Enable */
+#endif
+	/* SPI Enable */
+	Set_Bit(SPCR,SPCR_SPE);
 }
 
-void SPI_VidSend_Receive(u8 Copy_u8Data,u8 *Copy_u8Reading)
+void SPI_VidSend_Receive(u8 Copy_u8Mode,u8 *Copy_u8Data)
 {
-	SPDR=Copy_u8Data;
-	#if SPI_Interrupt == Disable		/* SPI Interrupt Enable */
+	u8 Local_u8Flush_Buffer=Flush_Buffer;
+	if(Copy_u8Mode==SPI_Send)
+	{
+		SPDR=*Copy_u8Data;
 		while(!Get_Bit(SPSR,SPSR_SPIF));
-	#elif SPI_Interrupt == Enable
-	#else
-			#warning (" Wrong Configuration !!")
-	#endif
-	*Copy_u8Reading = SPDR;
+		Local_u8Flush_Buffer = SPDR;
+	}
+	else if (Copy_u8Mode==SPI_Receive)
+	{
+		SPDR=Local_u8Flush_Buffer;
+		while(!Get_Bit(SPSR,SPSR_SPIF));
+		*Copy_u8Data = SPDR;
+	}
 }
 
 

@@ -4,6 +4,6 @@
 /* Inverting (COCSOB) - Nun_Inverting (COBSOC) */
 #define		PWM_Mode		COCSOB
 /* CPU Frequency */
-#define		CPU_Freq		4000000
+#define		CPU_Freq		8000000
 #endif
 /*_TIMER_CONFIG_H_*/

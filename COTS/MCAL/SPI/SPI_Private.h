@@ -3,9 +3,9 @@
 #define _SPI_PRIVATE_H_
 
 /******** Registers ********/
-#define   SPCR      *((volatile u8*)0x2D)
-#define   SPSR      *((volatile u8*)0x2E)
-#define   SPDR      *((volatile u8*)0x2F) /* SPI Data */
+#define   SPCR      *((volatile u8*)0x2D)	/* Control Register */
+#define   SPSR      *((volatile u8*)0x2E)	/* Status Register */
+#define   SPDR      *((volatile u8*)0x2F) 	/* SPI Data */
 
 /******** SPCR_Bits ********/       
 #define   SPCR_SPIE               7		/* SPI Interrupt Enable */
@@ -19,24 +19,27 @@
 
 /******** SPSR_Bits ********/
 #define   SPSR_SPIF               7		/* SPI Interrupt Flag */
-#define   SPSR_WCOL               6		/* Write COLlision Flag */
+#define   SPSR_WCOL               6		/* Write Collision Flag */
 #define   SPSR_SPI2X              0		/* Double SPI Speed Bit */
 
 /************* Macros for Configure ************/
-typedef enum {Master,Slave} SPIMode;
-#define   NULL		0
-#define   Enable	12
-#define   Disable	11
-#define   Left		10
-#define   Right		9
-#define   Rising	8
-#define   Falling	7
-#define   Setup		6
-#define   Sample	5
-#define   by_2		4
-#define   by_8		3
-#define   by_32		2
-#define   by_64		1
-
+typedef enum {Master,Slave,SPI_Interrupt_Enable,SPI_Interrupt_Disable} SPIMode;
+#define   Pre_Scalar_2				2
+#define   Pre_Scalar_4				4
+#define   Pre_Scalar_8				8
+#define   Pre_Scalar_16				16
+#define   Pre_Scalar_32				32
+#define   Pre_Scalar_64				64
+#define   NULL				0
+#define   Left				10
+#define   SPI_Send			10
+#define   SPI_Receive		10
+#define   Right				9
+#define   Normal			12
+#define   Double			13
+#define   Leading_Rising	8
+#define   Leading_Falling	7
+#define   Leading_Setup		6
+#define   Leading_Sample	5
 #endif 
 /*_SPI_PRIVATE_H_*/
